@@ -64,3 +64,17 @@ class TextboxDraft(TextboxDraftBase):
     
     class Config:
         orm_mode = True
+
+class TextboxCommitBase(BaseModel):
+    content: str
+    
+class TextboxCommitCreate(TextboxCommitBase):
+    pass
+    
+class TextboxCommit(TextboxCommitBase):
+    id: int
+    created_at: datetime.datetime
+    updated_at: datetime.datetime
+    
+    class Config:
+        orm_mode = True

@@ -79,3 +79,16 @@ def get_textbox_draft(db: Session, draft_id: int):
 
 def get_latest_textbox_draft(db: Session):
     return db.query(models.TextboxDraft).order_by(models.TextboxDraft.updated_at.desc()).first()
+
+def create_textbox_commit(db: Session, commit: schemas.TextboxCommitCreate):
+    db_commit = models.TextboxCommit(content=commit.content)
+    db.add(db_commit)
+    db.commit()
+    db.refresh(db_commit)
+    return db_commit
+    
+def get_textbox_commit(db: Session, commit_id: int):
+    return db.query(models.TextboxCommit).filter(models.TextboxCommit.id == commit_id).first()
+
+def get_latest_textbox_commit(db: Session):
+    return db.query(models.TextboxCommit).order_by(models.TextboxCommit.updated_at.desc()).first()

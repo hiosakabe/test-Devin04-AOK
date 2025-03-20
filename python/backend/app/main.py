@@ -6,6 +6,7 @@ from api.routers.users import users_router
 from api.routers.helloworld import helloworld_router
 from api.routers.todos import todos_router
 from api.routers.textbox_draft import textbox_draft_router
+from api.routers.textbox_commit import textbox_commit_router
 from core.auth import get_current_active_user
 from api.routers.auth import auth_router
 
@@ -59,5 +60,12 @@ app.include_router(
     textbox_draft_router,
     prefix='/api/v1',
     tags=['textbox_draft'],
+    dependencies=[Depends(get_current_active_user)],
+)
+
+app.include_router(
+    textbox_commit_router,
+    prefix='/api/v1',
+    tags=['textbox_commit'],
     dependencies=[Depends(get_current_active_user)],
 )
