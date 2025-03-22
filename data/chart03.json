@@ -1,0 +1,10 @@
+[
+    {
+        "id": 1, 
+        "repeats_question_exactly": 0
+    },
+    {
+        "id": 2, 
+        "repeats_question_exactly": 0.1
+    }
+]

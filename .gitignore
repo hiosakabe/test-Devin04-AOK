@@ -11,4 +11,3 @@ python/backend/app/__pycache__/*
 
 .venv.zip
 node_modules/
-data/
