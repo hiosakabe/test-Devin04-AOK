@@ -1,0 +1,50 @@
+version: '3.8'
+
+services:
+  frontend:
+    build:
+      context: ./NextJS/FE/package
+      dockerfile: Dockerfile.dev
+    volumes:
+      - ./NextJS/FE/package:/app
+      - /app/node_modules
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+      - CHOKIDAR_USEPOLLING=true
+      - WATCHPACK_POLLING=true
+    depends_on:
+      - backend
+
+  backend:
+    build:
+      context: ./python
+      dockerfile: Dockerfile
+    volumes:
+      - ./python:/app
+    ports:
+      - "8000:8000"
+    environment:
+      - DBHOST=db
+      - SQL_USERNAME=${SQL_USERNAME:-product_super}
+      - SQL_PASSWORD=${SQL_PASSWORD:-superuser}
+      - DB_NAME=${DB_NAME:-product2025}
+      - AzureConnectionFlag=False
+    depends_on:
+      - db
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+
+  db:
+    image: postgres:15
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_USER=${SQL_USERNAME:-product_super}
+      - POSTGRES_PASSWORD=${SQL_PASSWORD:-superuser}
+      - POSTGRES_DB=${DB_NAME:-product2025}
+    ports:
+      - "5432:5432"
+
+volumes:
+  postgres_data:
