@@ -21,6 +21,9 @@ COPY . .
 # Fix permissions
 RUN chmod -R 777 /app
 
+# Add current directory to Python path
+ENV PYTHONPATH=/app
+
 # Expose port
 EXPOSE 8000
 
