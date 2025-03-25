@@ -2,11 +2,8 @@ import jwt
 from fastapi import Depends, HTTPException, status
 from jwt import PyJWTError
 
-import sys
-sys.path.append('../')
-
-from db import models, schemas, db
-from db.crud import get_user_by_email, create_user
+from backend.app.db import models, schemas, db
+from backend.app.db.crud import get_user_by_email, create_user
 from . import security
 
 async def get_current_user(
