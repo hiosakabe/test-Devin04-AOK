@@ -1,10 +1,10 @@
 from fastapi import APIRouter, Request, Depends, Response, HTTPException
 import typing as t
 
-from db.db import get_db
-from db.crud import create_textbox_draft, get_latest_textbox_draft
-from db.schemas import TextboxDraftCreate, TextboxDraft
-from core.auth import get_current_active_user
+from backend.app.db.db import get_db
+from backend.app.db.crud import create_textbox_draft, get_latest_textbox_draft
+from backend.app.db.schemas import TextboxDraftCreate, TextboxDraft
+from backend.app.core.auth import get_current_active_user
 
 textbox_draft_router = r = APIRouter()
 
