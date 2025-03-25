@@ -11,8 +11,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy the rest of the application
 COPY . .
 
-# Make sure backend/app exists
-RUN mkdir -p /app/backend/app/db
+# Fix permissions
+RUN chmod -R 777 /app
 
 # Expose port
 EXPOSE 8000

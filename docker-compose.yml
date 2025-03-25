@@ -1,4 +1,5 @@
 version: '3.8'
+name: test-devin04-aok
 
 services:
   frontend:
@@ -23,6 +24,7 @@ services:
       dockerfile: Dockerfile
     volumes:
       - ./python:/app
+      - /app/backend/app/__pycache__
     ports:
       - "8000:8000"
     environment:
@@ -33,7 +35,7 @@ services:
       - AzureConnectionFlag=False
     depends_on:
       - db
-    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+    command: uvicorn backend.app.main:app --host 0.0.0.0 --port 8000 --reload
 
   db:
     image: postgres:15
