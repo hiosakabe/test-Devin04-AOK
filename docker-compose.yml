@@ -44,7 +44,7 @@ services:
       - POSTGRES_PASSWORD=${SQL_PASSWORD:-superuser}
       - POSTGRES_DB=${DB_NAME:-product2025}
     ports:
-      - "5433:5432"
+      - "5434:5432"
 
 volumes:
   postgres_data:
