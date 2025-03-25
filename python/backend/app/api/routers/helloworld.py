@@ -2,12 +2,12 @@ from fastapi import APIRouter, Request, Depends, Response, encoders
 import typing as t
 
 
-from db.db import get_db
-from db.crud import (
+from backend.app.db.db import get_db
+from backend.app.db.crud import (
     get_helloworld
 )
-from db.schemas import HelloWorldBase, HelloWorld
-from core.auth import get_current_active_user, get_current_active_superuser
+from backend.app.db.schemas import HelloWorldBase, HelloWorld
+from backend.app.core.auth import get_current_active_user, get_current_active_superuser
 
 helloworld_router = r = APIRouter()
 
@@ -27,4 +27,4 @@ async def helloworld_list(
     helloworld = get_helloworld(db)
     # This is necessary for react-admin to work
     response.headers["Content-Range"] = f"0-9/{len(helloworld)}"
-    return helloworld 
+    return helloworld  
