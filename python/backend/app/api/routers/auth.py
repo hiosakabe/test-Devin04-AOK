@@ -2,9 +2,9 @@ from fastapi.security import OAuth2PasswordRequestForm
 from fastapi import APIRouter, Depends, HTTPException, status
 from datetime import timedelta
 
-from db.db import get_db
-from core import security
-from core.auth import authenticate_user, sign_up_new_user
+from backend.app.db.db import get_db
+from backend.app.core import security
+from backend.app.core.auth import authenticate_user, sign_up_new_user
 
 auth_router = r = APIRouter()
 
