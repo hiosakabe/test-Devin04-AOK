@@ -1,14 +1,14 @@
 from fastapi import FastAPI, Depends
 from starlette.requests import Request
 from fastapi.middleware.cors import CORSMiddleware  # ① 追加
-from db.db import SessionLocal
-from api.routers.users import users_router
-from api.routers.helloworld import helloworld_router
-from api.routers.todos import todos_router
-from api.routers.textbox_draft import textbox_draft_router
-from api.routers.textbox_commit import textbox_commit_router
-from core.auth import get_current_active_user
-from api.routers.auth import auth_router
+from backend.app.db.db import SessionLocal
+from backend.app.api.routers.users import users_router
+from backend.app.api.routers.helloworld import helloworld_router
+from backend.app.api.routers.todos import todos_router
+from backend.app.api.routers.textbox_draft import textbox_draft_router
+from backend.app.api.routers.textbox_commit import textbox_commit_router
+from backend.app.core.auth import get_current_active_user
+from backend.app.api.routers.auth import auth_router
 
 import os
 import sys
