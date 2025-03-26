@@ -125,6 +125,20 @@ const ProductPerfomance = () => {
     setOpen(true);
   };
 
+  // モーダル内の行クリック時（ネストされたモーダル用）
+  const [nestedOpen, setNestedOpen] = React.useState(false);
+  const [selectedRun, setSelectedRun] = React.useState<any>(null);
+
+  const handleNestedRowClick = (run: any) => {
+    setSelectedRun(run);
+    setNestedOpen(true);
+  };
+
+  const handleNestedClose = () => {
+    setNestedOpen(false);
+    setSelectedRun(null);
+  };
+
   // モーダル閉じるとき
   const handleClose = () => {
     setOpen(false);
@@ -397,7 +411,12 @@ const ProductPerfomance = () => {
               </TableHead>
               <TableBody>
                 {linkedRuns.map((run) => (
-                  <TableRow key={run.id}>
+                  <TableRow 
+                    key={run.id}
+                    onClick={() => handleNestedRowClick(run)}
+                    hover
+                    style={{ cursor: "pointer" }}
+                  >
                     <TableCell>{run.id}</TableCell>
                     <TableCell>{run.name}</TableCell>
                     <TableCell>{run.status}</TableCell>
@@ -448,23 +467,69 @@ const ProductPerfomance = () => {
       </>
     )}
   </DialogContent>
-  <DialogActions sx={{ justifyContent: "center" }}>
-    <Button
-      onClick={handleClose}
-      variant="contained"
-      color="primary"
-      startIcon={<CloseIcon />}
-      sx={{
-        borderRadius: "8px",
-        textTransform: "none",
-        px: 3,
-        py: 1.2,
-        boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
-      }}
+  {/* Close button removed as per requirement */}
+</Dialog>
+
+{/* Nested Modal for Linked Runs */}
+<Dialog 
+  open={nestedOpen} 
+  onClose={handleNestedClose} 
+  maxWidth="sm"
+  fullWidth={true}
+  sx={{ 
+    "& .MuiDialog-paper": { 
+      borderRadius: "12px",
+      width: "60%",
+      maxWidth: "600px"
+    } 
+  }}
+>
+  <DialogTitle sx={{ pb: 1, display: 'flex', alignItems: 'center' }}>
+    {/* Back button */}
+    <IconButton 
+      edge="start" 
+      color="inherit" 
+      onClick={handleNestedClose} 
+      aria-label="back"
+      sx={{ mr: 1 }}
     >
-      Close
-    </Button>
-  </DialogActions>
+      <ArrowBackIcon />
+    </IconButton>
+    Run Details
+  </DialogTitle>
+  
+  <DialogContent dividers>
+    {selectedRun && (
+      <Box sx={{ p: 2 }}>
+        <Typography variant="h6" gutterBottom>Run Information</Typography>
+        
+        <Box sx={{ mb: 2 }}>
+          <Typography variant="subtitle1" fontWeight="bold">ID:</Typography>
+          <Typography variant="body1">{selectedRun.id}</Typography>
+        </Box>
+        
+        <Box sx={{ mb: 2 }}>
+          <Typography variant="subtitle1" fontWeight="bold">Name:</Typography>
+          <Typography variant="body1">{selectedRun.name}</Typography>
+        </Box>
+        
+        <Box sx={{ mb: 2 }}>
+          <Typography variant="subtitle1" fontWeight="bold">Status:</Typography>
+          <Typography variant="body1">{selectedRun.status}</Typography>
+        </Box>
+        
+        <Box sx={{ mb: 2 }}>
+          <Typography variant="subtitle1" fontWeight="bold">Date:</Typography>
+          <Typography variant="body1">{selectedRun.date}</Typography>
+        </Box>
+        
+        <Box sx={{ mb: 2 }}>
+          <Typography variant="subtitle1" fontWeight="bold">Metrics:</Typography>
+          <Typography variant="body1">{selectedRun.metrics}</Typography>
+        </Box>
+      </Box>
+    )}
+  </DialogContent>
 </Dialog>
     </>
   );
