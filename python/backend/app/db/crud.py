@@ -92,3 +92,35 @@ def get_textbox_commit(db: Session, commit_id: int):
 
 def get_latest_textbox_commit(db: Session):
     return db.query(models.TextboxCommit).order_by(models.TextboxCommit.updated_at.desc()).first()
+
+def create_prompt_draft(db: Session, draft: schemas.PromptDraftCreate):
+    db_draft = models.PromptDraft(
+        input_content=draft.input_content,
+        output_content=draft.output_content
+    )
+    db.add(db_draft)
+    db.commit()
+    db.refresh(db_draft)
+    return db_draft
+    
+def get_prompt_draft(db: Session, draft_id: int):
+    return db.query(models.PromptDraft).filter(models.PromptDraft.id == draft_id).first()
+
+def get_latest_prompt_draft(db: Session):
+    return db.query(models.PromptDraft).order_by(models.PromptDraft.updated_at.desc()).first()
+
+def create_prompt_commit(db: Session, commit: schemas.PromptCommitCreate):
+    db_commit = models.PromptCommit(
+        input_content=commit.input_content,
+        output_content=commit.output_content
+    )
+    db.add(db_commit)
+    db.commit()
+    db.refresh(db_commit)
+    return db_commit
+    
+def get_prompt_commit(db: Session, commit_id: int):
+    return db.query(models.PromptCommit).filter(models.PromptCommit.id == commit_id).first()
+
+def get_latest_prompt_commit(db: Session):
+    return db.query(models.PromptCommit).order_by(models.PromptCommit.updated_at.desc()).first()

@@ -78,3 +78,33 @@ class TextboxCommit(TextboxCommitBase):
     
     class Config:
         orm_mode = True
+
+class PromptDraftBase(BaseModel):
+    input_content: str
+    output_content: str
+    
+class PromptDraftCreate(PromptDraftBase):
+    pass
+    
+class PromptDraft(PromptDraftBase):
+    id: int
+    created_at: datetime.datetime
+    updated_at: datetime.datetime
+    
+    class Config:
+        orm_mode = True
+
+class PromptCommitBase(BaseModel):
+    input_content: str
+    output_content: str
+    
+class PromptCommitCreate(PromptCommitBase):
+    pass
+    
+class PromptCommit(PromptCommitBase):
+    id: int
+    created_at: datetime.datetime
+    updated_at: datetime.datetime
+    
+    class Config:
+        orm_mode = True

@@ -1,5 +1,5 @@
-import React from "react";
-import CloseIcon from "@mui/icons-material/Close";
+import React, { useState, useEffect } from "react";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import {
   Typography,
   Box,
@@ -17,8 +17,13 @@ import {
   DialogContent,
   DialogActions,
   Button,
+  IconButton,
+  Grid,
+  Paper,
+  TextField,
 } from "@mui/material";
 import BaseCard from "../shared/DashboardCard";
+import { getAuthToken } from "@/utils/auth";
 
 const products = [
   {
@@ -61,13 +66,21 @@ const products = [
 
 const ProductPerfomance = () => {
   // 月選択用
-  const [month, setMonth] = React.useState("1");
+  const [month, setMonth] = useState("1");
 
   // モーダル開閉用
-  const [open, setOpen] = React.useState(false);
+  const [open, setOpen] = useState(false);
 
   // クリックした行の情報を保持
-  const [selectedProduct, setSelectedProduct] = React.useState<any>(null);
+  const [selectedProduct, setSelectedProduct] = useState<any>(null);
+  
+  // Input/Output content state
+  const [inputContent, setInputContent] = useState<string>('');
+  const [outputContent, setOutputContent] = useState<string>('');
+  
+  // Save status and loading state
+  const [saveStatus, setSaveStatus] = useState<string>('');
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const handleChange = (event: any) => {
     setMonth(event.target.value);
@@ -84,6 +97,146 @@ const ProductPerfomance = () => {
     setOpen(false);
     setSelectedProduct(null);
   };
+  
+  // Handle input content change
+  const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setInputContent(e.target.value);
+  };
+
+  // Handle output content change
+  const handleOutputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setOutputContent(e.target.value);
+  };
+  
+  // Handle saving draft
+  const handleSaveDraft = async () => {
+    try {
+      setIsLoading(true);
+      setSaveStatus(''); // Clear any existing status message
+      
+      // Get authentication token
+      const tokenData = await getAuthToken();
+
+      // Send text to backend with token
+      const response = await fetch("http://localhost:8000/api/v1/prompt_draft", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${tokenData.access_token}`,
+        },
+        body: JSON.stringify({
+          input_content: inputContent,
+          output_content: outputContent
+        }),
+      });
+      
+      if (response.ok) {
+        setSaveStatus('下書きが保存されました');
+        // Use a cleanup function to ensure the timeout is cleared if component unmounts
+        const timer = setTimeout(() => setSaveStatus(''), 3000); // Clear status after 3 seconds
+        return () => clearTimeout(timer);
+      } else {
+        setSaveStatus('保存に失敗しました');
+        const timer = setTimeout(() => setSaveStatus(''), 5000); // Clear error status after 5 seconds
+        return () => clearTimeout(timer);
+      }
+    } catch (error) {
+      console.error('下書き保存に失敗しました:', error);
+      setSaveStatus('保存に失敗しました');
+      const timer = setTimeout(() => setSaveStatus(''), 5000); // Clear error status after 5 seconds
+      return () => clearTimeout(timer);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  
+  // Handle publishing
+  const handlePublish = async () => {
+    try {
+      setIsLoading(true);
+      setSaveStatus(''); // Clear any existing status message
+      
+      // Get authentication token
+      const tokenData = await getAuthToken();
+
+      // Send text to backend with token
+      const response = await fetch("http://localhost:8000/api/v1/prompt_commit", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${tokenData.access_token}`,
+        },
+        body: JSON.stringify({
+          input_content: inputContent,
+          output_content: outputContent
+        }),
+      });
+      
+      if (response.ok) {
+        setSaveStatus('公開されました');
+        const timer = setTimeout(() => setSaveStatus(''), 3000); // Clear status after 3 seconds
+        return () => clearTimeout(timer);
+      } else {
+        setSaveStatus('公開に失敗しました');
+        const timer = setTimeout(() => setSaveStatus(''), 5000); // Clear error status after 5 seconds
+        return () => clearTimeout(timer);
+      }
+    } catch (error) {
+      console.error('公開に失敗しました:', error);
+      setSaveStatus('公開に失敗しました');
+      const timer = setTimeout(() => setSaveStatus(''), 5000); // Clear error status after 5 seconds
+      return () => clearTimeout(timer);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  
+  // Load the latest draft when modal opens
+  useEffect(() => {
+    let statusTimer: NodeJS.Timeout;
+    
+    const loadDraft = async () => {
+      if (!open) return; // Only load draft when modal is open
+      
+      try {
+        setIsLoading(true);
+        setSaveStatus(''); // Clear any existing status message
+        
+        // Get authentication token
+        const tokenData = await getAuthToken();
+        
+        // Fetch latest draft
+        const response = await fetch("http://localhost:8000/api/v1/prompt_draft", {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${tokenData.access_token}`,
+          },
+        });
+        
+        if (response.ok) {
+          const draftData = await response.json();
+          setInputContent(draftData.input_content);
+          setOutputContent(draftData.output_content);
+        } else if (response.status !== 404) {
+          // Only show error if it's not a 404 (no drafts found)
+          console.error('下書きの読み込みに失敗しました:', response.statusText);
+          setSaveStatus('読み込みに失敗しました');
+          statusTimer = setTimeout(() => setSaveStatus(''), 5000);
+        }
+      } catch (error) {
+        console.error('下書きの読み込みに失敗しました:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    loadDraft();
+    
+    // Cleanup function to clear any timeouts when component unmounts or effect reruns
+    return () => {
+      if (statusTimer) clearTimeout(statusTimer);
+    };
+  }, [open]);
 
   return (
     <>
@@ -200,115 +353,186 @@ const ProductPerfomance = () => {
         </TableContainer>
       </BaseCard>
 
-      {/* モーダル */}
-{/* モーダル */}
-<Dialog open={open} onClose={handleClose} sx={{ "& .MuiDialog-paper": { borderRadius: "12px" } }}>
-  <DialogTitle>Product Details</DialogTitle>
-  <DialogContent dividers>
-    {selectedProduct && (
-      <Table
-        aria-label="product-details"
-        sx={{
-          whiteSpace: "nowrap",
-        }}
-      >
-        <TableBody>
-          {/* ID */}
-          <TableRow>
-            <TableCell>
-              <Typography color="textSecondary" variant="h6">
-                Id
-              </Typography>
-            </TableCell>
-            <TableCell>
-              <Typography fontSize="15px" fontWeight={500}>
-                {selectedProduct.id}
-              </Typography>
-            </TableCell>
-          </TableRow>
-          {/* Post */}
-          <TableRow>
-            <TableCell>
-              <Typography color="textSecondary" variant="h6">
-                Assigned
-              </Typography>
-            </TableCell>
-            <TableCell>
-              <Typography variant="h6" fontWeight={600}>
-                {selectedProduct.name}
-              </Typography>
-              <Typography color="textSecondary" fontSize="13px">
-                {selectedProduct.post}
-              </Typography>
-            </TableCell>
-          </TableRow>
-          {/* Product Name */}
-          <TableRow>
-            <TableCell>
-              <Typography color="textSecondary" variant="h6">
-                Name
-              </Typography>
-            </TableCell>
-            <TableCell>
-              <Typography color="textSecondary" variant="h6">
-                {selectedProduct.pname}
-              </Typography>
-            </TableCell>
-          </TableRow>
-          {/* Priority */}
-          <TableRow>
-            <TableCell>
-              <Typography color="textSecondary" variant="h6">
-                Priority
-              </Typography>
-            </TableCell>
-            <TableCell>
-              <Chip
-                sx={{
-                  pl: "4px",
-                  pr: "4px",
-                  backgroundColor: selectedProduct.pbg,
-                  color: "#fff",
-                }}
-                size="small"
-                label={selectedProduct.priority}
-              />
-            </TableCell>
-          </TableRow>
-          {/* Budget */}
-          <TableRow>
-            <TableCell>
-              <Typography color="textSecondary" variant="h6">
-                Budget
-              </Typography>
-            </TableCell>
-            <TableCell align="right">
-              <Typography variant="h6">
-                ${selectedProduct.budget}k
-              </Typography>
-            </TableCell>
-          </TableRow>
-        </TableBody>
-      </Table>
-    )}
-  </DialogContent>
-  <DialogActions sx={{ justifyContent: "center" }}>
-    <Button
-      onClick={handleClose}
-      variant="contained"
-      color="primary"
-      startIcon={<CloseIcon />} // アイコン追加
-      sx={{
-        borderRadius: "8px", // 角丸デザイン
-        textTransform: "none", // 大文字化を解除
-        px: 3, // 水平方向の余白
-        py: 1.2, // 垂直方向の余白
-        boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)", // 影を追加
-      }}
+      {/* Enhanced Modal with two-column layout */}
+<Dialog 
+  open={open} 
+  onClose={handleClose} 
+  maxWidth="lg"
+  fullWidth={true}
+  sx={{ 
+    "& .MuiDialog-paper": { 
+      borderRadius: "12px",
+      width: "90%",
+      maxWidth: "1200px",
+      height: "80%",
+      maxHeight: "800px"
+    } 
+  }}
+>
+  <DialogTitle sx={{ pb: 1, display: 'flex', alignItems: 'center' }}>
+    {/* Back button */}
+    <IconButton 
+      edge="start" 
+      color="inherit" 
+      onClick={handleClose} 
+      aria-label="back"
+      sx={{ mr: 1 }}
     >
-      Close
-    </Button>
-  </DialogActions>
+      <ArrowBackIcon />
+    </IconButton>
+    Prompt Editor
+  </DialogTitle>
+  
+  <DialogContent dividers sx={{ p: 3 }}>
+    {/* Two column layout */}
+    <Grid container spacing={3}>
+      {/* Input column (left) */}
+      <Grid item xs={12} md={6}>
+        <Paper elevation={0} sx={{ p: 2, height: '100%', display: 'flex', flexDirection: 'column' }}>
+          {/* Input label */}
+          <Typography variant="h6" gutterBottom>
+            Input
+          </Typography>
+          
+          {/* Input text box */}
+          <Box sx={{ 
+            flex: 1, 
+            border: '1px solid #e0e0e0', 
+            borderRadius: '4px', 
+            position: 'relative',
+            display: 'flex',
+            flexDirection: 'column',
+            mb: 2
+          }}>
+            <textarea
+              style={{ 
+                flex: 1,
+                padding: '12px',
+                outline: 'none',
+                resize: 'none',
+                border: 'none',
+                fontFamily: 'monospace',
+                minHeight: '400px'
+              }}
+              value={inputContent}
+              onChange={handleInputChange}
+              placeholder="Enter input text here..."
+            />
+          </Box>
+        </Paper>
+      </Grid>
+      
+      {/* Output column (right) */}
+      <Grid item xs={12} md={6}>
+        <Paper elevation={0} sx={{ p: 2, height: '100%', display: 'flex', flexDirection: 'column' }}>
+          {/* Output label */}
+          <Typography variant="h6" gutterBottom>
+            Output
+          </Typography>
+          
+          {/* Output text box */}
+          <Box sx={{ 
+            flex: 1, 
+            border: '1px solid #e0e0e0', 
+            borderRadius: '4px', 
+            position: 'relative',
+            display: 'flex',
+            flexDirection: 'column',
+            mb: 2
+          }}>
+            {/* Save status indicator */}
+            {saveStatus && (
+              <Box sx={{ 
+                position: 'absolute', 
+                top: '8px', 
+                right: '8px', 
+                px: 2, 
+                py: 1, 
+                backgroundColor: 'rgba(0, 200, 83, 0.1)', 
+                borderRadius: '4px',
+                zIndex: 10
+              }}>
+                <Typography variant="body2" color="primary">
+                  {saveStatus}
+                </Typography>
+              </Box>
+            )}
+            
+            {/* Loading indicator */}
+            {isLoading && (
+              <Box sx={{ 
+                position: 'absolute', 
+                inset: 0, 
+                display: 'flex', 
+                alignItems: 'center', 
+                justifyContent: 'center', 
+                backgroundColor: 'rgba(255, 255, 255, 0.7)',
+                zIndex: 20
+              }}>
+                <Typography color="primary" sx={{ display: 'flex', alignItems: 'center' }}>
+                  Loading...
+                </Typography>
+              </Box>
+            )}
+            
+            <textarea
+              style={{ 
+                flex: 1,
+                padding: '12px',
+                outline: 'none',
+                resize: 'none',
+                border: 'none',
+                fontFamily: 'monospace',
+                minHeight: '400px'
+              }}
+              value={outputContent}
+              onChange={handleOutputChange}
+              placeholder="Enter output text here..."
+            />
+          </Box>
+          
+          {/* Action buttons */}
+          <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2, mt: 2 }}>
+            <Button
+              onClick={handleSaveDraft}
+              variant="contained"
+              color="primary"
+              sx={{
+                borderRadius: "8px",
+                textTransform: "none",
+                px: 3,
+                py: 1.2,
+                backgroundColor: '#4285F4',
+                '&:hover': {
+                  backgroundColor: '#2A75F3',
+                }
+              }}
+            >
+              一時保存
+            </Button>
+            
+            <Button
+              onClick={handlePublish}
+              variant="contained"
+              color="success"
+              sx={{
+                borderRadius: "8px",
+                textTransform: "none",
+                px: 3,
+                py: 1.2,
+                backgroundColor: '#0F9D58',
+                '&:hover': {
+                  backgroundColor: '#0B8043',
+                }
+              }}
+            >
+              公開
+            </Button>
+          </Box>
+        </Paper>
+      </Grid>
+    </Grid>
+  </DialogContent>
 </Dialog>
     </>
   );

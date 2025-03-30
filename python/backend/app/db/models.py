@@ -33,3 +33,21 @@ class TextboxCommit(Base):
     content = Column(String, nullable=False)
     created_at = Column(DateTime, default=datetime.datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow)
+
+class PromptDraft(Base):
+    __tablename__ = "prompt_draft"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    input_content = Column(String, nullable=False)
+    output_content = Column(String, nullable=False)
+    created_at = Column(DateTime, default=datetime.datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow)
+
+class PromptCommit(Base):
+    __tablename__ = "prompt_commit"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    input_content = Column(String, nullable=False)
+    output_content = Column(String, nullable=False)
+    created_at = Column(DateTime, default=datetime.datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow)
