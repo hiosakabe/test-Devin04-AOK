@@ -1,8 +1,9 @@
 "use client";
-import { styled, Container, Box } from "@mui/material";
-import React from "react";
+import { styled, Container, Box, CircularProgress, Typography } from "@mui/material";
+import React, { useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/app/context/AuthContext";
 import Header from "@/app/(DashboardLayout)/layout/header/Header";
-//import Sidebar from "@/app/(DashboardLayout)/layout/sidebar/Sidebar";
 import Sidebar from "@/app/commonLayout/layout/sidebar/Sidebar";
 import Footer from "./layout/footer/page";
 import Topbar from "./layout/header/Topbar";
@@ -10,7 +11,6 @@ import theme from "@/utils/theme";
 
 const MainWrapper = styled("div")(() => ({
   display: "flex",
-  // minHeight: "100vh",
   width: "100%",
 }));
 
@@ -26,17 +26,46 @@ interface Props {
   children: React.ReactNode;
 }
 
-
-
 export default function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const { isAuthenticated, loading } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!isAuthenticated && !loading) {
+      router.push('/authentication/login');
+    }
+  }, [isAuthenticated, loading, router]);
+
+  if (loading) {
+    return (
+      <Box 
+        sx={{ 
+          display: 'flex', 
+          flexDirection: 'column',
+          justifyContent: 'center', 
+          alignItems: 'center', 
+          height: '100vh',
+          backgroundColor: '#f5f7fa'
+        }}
+      >
+        <CircularProgress size={60} thickness={4} color="primary" />
+        <Typography variant="h6" sx={{ mt: 2 }}>
+          読み込み中...
+        </Typography>
+      </Box>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return null;
+  }
 
   return (
     <MainWrapper className="mainwrapper">
-
       {/* ------------------------------------------- */}
       {/* Main Wrapper */}
       {/* ------------------------------------------- */}
@@ -46,22 +75,18 @@ export default function RootLayout({
         {/* ------------------------------------------- */}
         {/* Sidebar */}
         {/* ------------------------------------------- */}
-
-        <Sidebar
-
-        />
+        <Sidebar />
+        
         {/* ------------------------------------------- */}
         {/* PageContent */}
         {/* ------------------------------------------- */}
         <Box
           sx={{
-
             [theme.breakpoints.up("lg")]: {
               marginLeft: '270px',
             },
           }}
         >
-          
           {/* ------------------------------------------- */}
           {/* Header */}
           {/* ------------------------------------------- */}
@@ -73,18 +98,13 @@ export default function RootLayout({
               minHeight: 'calc(100vh - 240px)'
             }}
           >
-
-
             {/* ------------------------------------------- */}
             {/* Page Route */}
             {/* ------------------------------------------- */}
             <Box>{children}</Box>
-            <div>test</div>
             {/* ------------------------------------------- */}
             {/* End Page */}
             {/* ------------------------------------------- */}
-
-
           </Container>
           {/* ------------------------------------------- */}
           {/* Footer */}

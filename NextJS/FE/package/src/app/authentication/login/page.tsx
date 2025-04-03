@@ -1,7 +1,6 @@
 'use client'
 import React from 'react';
-import Link from 'next/link';
-import { Grid2 as Grid, Box, Card, Stack, Typography } from '@mui/material';
+import { Box, Container } from '@mui/material';
 import Logo from "@/app/(DashboardLayout)/layout/shared/logo/Logo";
 import AuthLogin from '../auth/AuthLogin';
 
@@ -10,59 +9,49 @@ const Login = () => {
         <Box
             sx={{
                 position: 'relative',
+                minHeight: '100vh',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                backgroundImage: 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)',
                 '&:before': {
                     content: '""',
-                    background: 'radial-gradient(#d2f1df, #d3d7fa, #bad8f4)',
-                    backgroundSize: '400% 400%',
-                    animation: 'gradient 15s ease infinite',
                     position: 'absolute',
-                    height: '100%',
-                    width: '100%',
-                    opacity: '0.3',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    backgroundImage: 'url("/images/bg-pattern.svg")',
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'center',
+                    opacity: 0.05,
+                    zIndex: 0,
                 },
             }}
         >
-            <Grid container spacing={0} justifyContent="center" sx={{ height: '100vh' }}>
-                <Grid
-                    size={{ xs: 12, lg: 4, xl: 3, sm: 12 }}
-                    display="flex"
-                    justifyContent="center"
-                    alignItems="center"
+            <Container maxWidth="sm" sx={{ position: 'relative', zIndex: 1 }}>
+                <Box 
+                    sx={{ 
+                        display: 'flex', 
+                        flexDirection: 'column', 
+                        alignItems: 'center',
+                        mb: 4
+                    }}
                 >
-                    <Card elevation={2} sx={{ p: 4, zIndex: 1, width: '100%', maxWidth: '500px' }}>
-                        <Box display="flex" alignItems="center" margin='0 auto' justifyContent="center">
-                            {/* <Logo /> */}
-                            <Logo />
-                        </Box>
-                        <AuthLogin
-                            subtext={
-                                <Typography variant="subtitle2" textAlign="center" color="textSecondary" my={1}>
-                                    Your Social Campaigns
-                                </Typography>
-                            }
-                            subtitle={
-                                <Stack direction="row" spacing={1} justifyContent="center" mt={3}>
-                                    <Typography color="textSecondary" variant="subtitle1" fontWeight="500">
-                                        New to Flexy?
-                                    </Typography>
-                                    <Typography
-                                        component={Link}
-                                        href="/authentication/register"
-                                        fontWeight="500"
-                                        sx={{
-                                            textDecoration: 'none',
-                                            color: 'primary.main',
-                                        }}
-                                    >
-                                        Create an account
-                                    </Typography>
-                                </Stack>
-                            }
-                        />
-                    </Card>
-                </Grid>
-            </Grid>
-
+                    <Box 
+                        sx={{ 
+                            mb: 4, 
+                            p: 2, 
+                            backgroundColor: 'white', 
+                            borderRadius: '50%',
+                            boxShadow: '0px 4px 20px rgba(0, 0, 0, 0.08)'
+                        }}
+                    >
+                        <Logo />
+                    </Box>
+                    <AuthLogin />
+                </Box>
+            </Container>
         </Box>
     )
 }
