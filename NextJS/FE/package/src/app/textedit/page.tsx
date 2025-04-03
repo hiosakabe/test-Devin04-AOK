@@ -1,87 +1,105 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { getAuthToken } from '@/utils/auth';
+import React, { useState, useEffect, useRef } from 'react';
+import { getAuthHeaders } from '@/utils/auth';
 
 export default function TextEditPage() {
   const [text, setText] = useState<string>('');
   const [saveStatus, setSaveStatus] = useState<string>('');
+  const [statusType, setStatusType] = useState<'success' | 'error'>('success');
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const statusTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const lines = text.split('\n');
+  
+  // Clear any existing timeout when component unmounts
+  useEffect(() => {
+    return () => {
+      if (statusTimeoutRef.current) {
+        clearTimeout(statusTimeoutRef.current);
+      }
+    };
+  }, []);
   
   const handleTextChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setText(e.target.value);
   };
 
+  // Helper function to show status messages with auto-disappearing behavior
+  const showStatusMessage = (message: string, type: 'success' | 'error') => {
+    // Clear any existing timeout
+    if (statusTimeoutRef.current) {
+      clearTimeout(statusTimeoutRef.current);
+    }
+    
+    setSaveStatus(message);
+    setStatusType(type);
+    
+    // Set timeout to clear message
+    const timeout = setTimeout(() => {
+      setSaveStatus('');
+    }, type === 'success' ? 3000 : 5000); // 3 seconds for success, 5 for errors
+    
+    statusTimeoutRef.current = timeout;
+  };
+
   const handleCopy = () => {
     navigator.clipboard.writeText(text)
       .then(() => {
-        alert('テキストがコピーされました');
+        showStatusMessage('テキストがコピーされました', 'success');
       })
       .catch(err => {
         console.error('コピーに失敗しました:', err);
+        showStatusMessage('コピーに失敗しました', 'error');
       });
   };
   
   const handlePublish = async () => {
     try {
-      // Get authentication token using the utility function
-      const tokenData = await getAuthToken();
+      // Get authentication headers using the utility function
+      const headers = await getAuthHeaders();
 
       // Send text to backend with token
       const response = await fetch("http://localhost:8000/api/v1/textbox_commit", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${tokenData.access_token}`,
-        },
+        headers,
         body: JSON.stringify({
           content: text
         }),
       });
       
       if (response.ok) {
-        setSaveStatus('公開されました');
-        setTimeout(() => setSaveStatus(''), 3000); // Clear status after 3 seconds
+        showStatusMessage('公開されました', 'success');
       } else {
-        setSaveStatus('公開に失敗しました');
-        setTimeout(() => setSaveStatus(''), 5000); // Clear error status after 5 seconds
+        showStatusMessage('公開に失敗しました', 'error');
       }
     } catch (error) {
       console.error('公開に失敗しました:', error);
-      setSaveStatus('公開に失敗しました');
-      setTimeout(() => setSaveStatus(''), 5000); // Clear error status after 5 seconds
+      showStatusMessage('公開に失敗しました', 'error');
     }
   };
   
   const handleSaveDraft = async () => {
     try {
-      // Get authentication token using the utility function
-      const tokenData = await getAuthToken();
+      // Get authentication headers using the utility function
+      const headers = await getAuthHeaders();
 
       // Send text to backend with token
       const res2 = await fetch("http://localhost:8000/api/v1/textbox_draft", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${tokenData.access_token}`,
-        },
+        headers,
         body: JSON.stringify({
           content: text
         }),
       });
       
       if (res2.ok) {
-        setSaveStatus('下書きが保存されました');
-        setTimeout(() => setSaveStatus(''), 3000); // Clear status after 3 seconds
+        showStatusMessage('下書きが保存されました', 'success');
       } else {
-        setSaveStatus('保存に失敗しました');
-        setTimeout(() => setSaveStatus(''), 5000); // Clear error status after 5 seconds
+        showStatusMessage('保存に失敗しました', 'error');
       }
     } catch (error) {
       console.error('下書き保存に失敗しました:', error);
-      setSaveStatus('保存に失敗しました');
-      setTimeout(() => setSaveStatus(''), 5000); // Clear error status after 5 seconds
+      showStatusMessage('保存に失敗しました', 'error');
     }
   };
 
@@ -89,15 +107,13 @@ export default function TextEditPage() {
     const loadDraft = async () => {
       try {
         setIsLoading(true);
-        // Get authentication token
-        const tokenData = await getAuthToken();
+        // Get authentication headers
+        const headers = await getAuthHeaders();
         
         // Fetch latest draft
         const response = await fetch("http://localhost:8000/api/v1/textbox_draft", {
           method: "GET",
-          headers: {
-            Authorization: `Bearer ${tokenData.access_token}`,
-          },
+          headers,
         });
         
         if (response.ok) {
@@ -106,8 +122,7 @@ export default function TextEditPage() {
         } else if (response.status !== 404) {
           // Only show error if it's not a 404 (no drafts found)
           console.error('下書きの読み込みに失敗しました:', response.statusText);
-          setSaveStatus('読み込みに失敗しました');
-          setTimeout(() => setSaveStatus(''), 5000);
+          showStatusMessage('読み込みに失敗しました', 'error');
         }
       } catch (error) {
         console.error('下書きの読み込みに失敗しました:', error);
@@ -155,9 +170,13 @@ export default function TextEditPage() {
           </svg>
         </button>
         
-        {/* Add save status indicator */}
+        {/* Add save status indicator with dynamic styling based on status type */}
         {saveStatus && (
-          <div className="absolute top-2 right-48 px-3 py-1 bg-green-100 text-green-700 rounded border border-green-300 z-10">
+          <div className={`absolute top-2 right-48 px-3 py-1 rounded border z-10 transition-opacity ${
+            statusType === 'success' 
+              ? 'bg-green-100 text-green-700 border-green-300' 
+              : 'bg-red-100 text-red-700 border-red-300'
+          }`}>
             {saveStatus}
           </div>
         )}

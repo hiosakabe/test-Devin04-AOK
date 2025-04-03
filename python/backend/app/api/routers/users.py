@@ -2,16 +2,16 @@ from fastapi import APIRouter, Request, Depends, Response, encoders
 import typing as t
 
 
-from db.db import get_db
-from db.crud import (
+from app.db.db import get_db
+from app.db.crud import (
     get_users,
     get_user,
     create_user,
     delete_user,
     edit_user,
 )
-from db.schemas import UserCreate, UserEdit, User, UserOut
-from core.auth import get_current_active_user, get_current_active_superuser
+from app.db.schemas import UserCreate, UserEdit, User, UserOut
+from app.core.auth import get_current_active_user, get_current_active_superuser
 
 users_router = r = APIRouter()
 

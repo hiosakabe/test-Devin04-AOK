@@ -3,13 +3,15 @@ from fastapi.security import OAuth2PasswordBearer
 from passlib.context import CryptContext
 from datetime import datetime, timedelta
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/token")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/token")
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto") 
 
-SECRET_KEY = "kensaki"
+import os
+
+SECRET_KEY = os.environ.get('JWT_SECRET_KEY', os.urandom(32).hex())
 ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 30
+ACCESS_TOKEN_EXPIRE_MINUTES = 60  # 1 hour token validity
 
 
 def get_password_hash(password: str) -> str:

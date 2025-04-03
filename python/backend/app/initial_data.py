@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 
-from db.db import get_db
-from db.crud import create_user
-from db.schemas import UserCreate
-from db.db import SessionLocal, engine , DATABASE_URL
-from db.models import Base
+from app.db.db import get_db
+from app.db.crud import create_user
+from app.db.schemas import UserCreate
+from app.db.db import SessionLocal, engine , DATABASE_URL
+from app.db.models import Base
 import urllib
 from urllib.parse import unquote
 

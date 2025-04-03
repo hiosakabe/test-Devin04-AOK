@@ -2,12 +2,12 @@ from fastapi import APIRouter, Request, Depends, Response, encoders
 import typing as t
 
 
-from db.db import get_db
-from db.crud import (
+from app.db.db import get_db
+from app.db.crud import (
     get_helloworld
 )
-from db.schemas import HelloWorldBase, HelloWorld
-from core.auth import get_current_active_user, get_current_active_superuser
+from app.db.schemas import HelloWorldBase, HelloWorld
+from app.core.auth import get_current_active_user, get_current_active_superuser
 
 helloworld_router = r = APIRouter()
 
