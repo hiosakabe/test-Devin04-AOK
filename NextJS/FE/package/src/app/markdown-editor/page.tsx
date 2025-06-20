@@ -6,6 +6,24 @@ import remarkGfm from 'remark-gfm';
 import rehypeHighlight from 'rehype-highlight';
 import rehypeRaw from 'rehype-raw';
 import { getAuthToken } from '@/utils/auth';
+import {
+  Box,
+  Card,
+  CardContent,
+  Typography,
+  Button,
+  IconButton,
+  Grid2 as Grid,
+  Paper,
+  Divider,
+  Chip,
+  Stack,
+  InputAdornment,
+  Fade,
+  Tooltip
+} from '@mui/material';
+import { styled, useTheme } from '@mui/material/styles';
+import CustomTextField from '@/app/(DashboardLayout)/components/forms/theme-elements/CustomTextField';
 
 interface MarkdownNote {
   id: number;
@@ -15,6 +33,47 @@ interface MarkdownNote {
   created_at: string;
   updated_at: string;
 }
+
+const StyledSidebar = styled(Paper)(({ theme }) => ({
+  height: '100vh',
+  borderRadius: 0,
+  borderRight: `1px solid ${theme.palette.divider}`,
+  backgroundColor: theme.palette.background.paper,
+  display: 'flex',
+  flexDirection: 'column',
+}));
+
+const StyledMainContent = styled(Box)(({ theme }) => ({
+  height: '100vh',
+  display: 'flex',
+  flexDirection: 'column',
+  backgroundColor: theme.palette.background.default,
+}));
+
+const StyledNoteCard = styled(Card)<{ selected?: boolean }>(({ theme, selected }) => ({
+  margin: theme.spacing(1),
+  cursor: 'pointer',
+  transition: 'all 0.2s ease-in-out',
+  border: selected ? `2px solid ${theme.palette.primary.main}` : `1px solid ${theme.palette.divider}`,
+  backgroundColor: selected ? theme.palette.primary.light : theme.palette.background.paper,
+  '&:hover': {
+    transform: 'translateY(-2px)',
+    boxShadow: theme.shadows[4],
+  },
+}));
+
+const StyledEditorContainer = styled(Box)(({ theme }) => ({
+  display: 'flex',
+  height: '100%',
+  '& .editor-pane, & .preview-pane': {
+    flex: 1,
+    display: 'flex',
+    flexDirection: 'column',
+  },
+  '& .editor-pane': {
+    borderRight: `1px solid ${theme.palette.divider}`,
+  },
+}));
 
 export default function MarkdownEditorPage() {
   const [notes, setNotes] = useState<MarkdownNote[]>([]);
@@ -226,149 +285,248 @@ export default function MarkdownEditorPage() {
   }
 
   return (
-    <div className="flex h-screen bg-gray-50" onKeyDown={handleKeyDown}>
-      <div className="w-80 bg-white border-r border-gray-200 flex flex-col">
-        <div className="p-4 border-b border-gray-200">
-          <div className="flex items-center justify-between mb-4">
-            <h1 className="text-xl font-bold text-gray-800">Markdown Notes</h1>
-            <button
-              onClick={createNewNote}
-              className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
-              title="New Note (Ctrl+N)"
-            >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-              </svg>
-            </button>
-          </div>
-          
-          <div className="flex">
-            <input
-              type="text"
-              placeholder="Search notes..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && searchNotes()}
-              className="flex-1 px-3 py-2 border border-gray-300 rounded-l focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-            <button
-              onClick={searchNotes}
-              className="px-3 py-2 bg-gray-100 border border-l-0 border-gray-300 rounded-r hover:bg-gray-200"
-            >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
-            </button>
-          </div>
-        </div>
-        
-        <div className="flex-1 overflow-y-auto">
-          {notes.length === 0 ? (
-            <div className="p-4 text-gray-500 text-center">
-              No notes found. Create your first note!
-            </div>
-          ) : (
-            notes.map((note) => (
-              <div
-                key={note.id}
-                className={`p-3 border-b border-gray-100 cursor-pointer hover:bg-gray-50 ${
-                  currentNote?.id === note.id ? 'bg-blue-50 border-l-4 border-l-blue-500' : ''
-                }`}
-                onClick={() => selectNote(note)}
-              >
-                <div className="flex items-center justify-between">
-                  <h3 className="font-medium text-gray-800 truncate">{note.title}</h3>
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      deleteNote(note.id);
-                    }}
-                    className="text-gray-400 hover:text-red-500 opacity-0 group-hover:opacity-100"
+    <Box sx={{ display: 'flex', height: '100vh', bgcolor: 'background.default' }} onKeyDown={handleKeyDown}>
+      <Grid container sx={{ height: '100%' }}>
+        <Grid size={4}>
+          <StyledSidebar elevation={0}>
+            <Box sx={{ p: 3, borderBottom: 1, borderColor: 'divider' }}>
+              <Stack direction="row" justifyContent="space-between" alignItems="center" mb={3}>
+                <Typography variant="h4" color="primary" fontWeight="bold">
+                  Markdown Notes
+                </Typography>
+                <Tooltip title="New Note (Ctrl+N)">
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    onClick={createNewNote}
+                    sx={{ minWidth: 'auto', p: 1.5, borderRadius: 2 }}
                   >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M12 4v16m8-8H4" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"/>
                     </svg>
-                  </button>
-                </div>
-                <p className="text-sm text-gray-500 mt-1 truncate">
-                  {note.content.replace(/[#*`]/g, '').substring(0, 60)}...
-                </p>
-                <p className="text-xs text-gray-400 mt-1">
-                  {new Date(note.updated_at).toLocaleDateString()}
-                </p>
-              </div>
-            ))
-          )}
-        </div>
-      </div>
-
-      <div className="flex-1 flex flex-col">
-        {currentNote ? (
-          <>
-            <div className="p-4 border-b border-gray-200 bg-white">
-              <div className="flex items-center justify-between">
-                <input
-                  type="text"
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
-                  className="text-xl font-bold bg-transparent border-none outline-none flex-1"
-                  placeholder="Note title..."
-                />
-                <div className="flex items-center space-x-2">
-                  {saveStatus && (
-                    <span className="text-sm text-green-600">{saveStatus}</span>
-                  )}
-                  <button
-                    onClick={saveNote}
-                    className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 transition-colors"
-                    title="Save (Ctrl+S)"
-                  >
-                    Save
-                  </button>
-                </div>
-              </div>
-            </div>
-            
-            <div className="flex-1 flex">
-              <div className="w-1/2 border-r border-gray-200">
-                <div className="p-2 bg-gray-100 border-b border-gray-200">
-                  <span className="text-sm font-medium text-gray-600">Editor</span>
-                </div>
-                <textarea
-                  value={content}
-                  onChange={(e) => setContent(e.target.value)}
-                  className="w-full h-full p-4 resize-none outline-none font-mono text-sm"
-                  placeholder="Start writing your markdown here..."
-                />
-              </div>
+                  </Button>
+                </Tooltip>
+              </Stack>
               
-              <div className="w-1/2">
-                <div className="p-2 bg-gray-100 border-b border-gray-200">
-                  <span className="text-sm font-medium text-gray-600">Preview</span>
-                </div>
-                <div className="h-full overflow-y-auto p-4 markdown-preview">
-                  <ReactMarkdown
-                    remarkPlugins={[remarkGfm]}
-                    rehypePlugins={[rehypeHighlight, rehypeRaw]}
-                  >
-                    {processMarkdownLinks(content)}
-                  </ReactMarkdown>
-                </div>
-              </div>
-            </div>
-          </>
-        ) : (
-          <div className="flex-1 flex items-center justify-center text-gray-500">
-            <div className="text-center">
-              <svg className="w-16 h-16 mx-auto mb-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-              </svg>
-              <p className="text-lg">Select a note to start editing</p>
-              <p className="text-sm mt-2">Or create a new note to get started</p>
-            </div>
-          </div>
-        )}
-      </div>
-    </div>
+              <CustomTextField
+                fullWidth
+                placeholder="Search notes..."
+                value={searchQuery}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchQuery(e.target.value)}
+                onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => e.key === 'Enter' && searchNotes()}
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton onClick={searchNotes} edge="end">
+                        <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
+                          <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"/>
+                        </svg>
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                }}
+              />
+            </Box>
+            
+            <Box sx={{ flex: 1, overflow: 'auto', p: 1 }}>
+              {notes.length === 0 ? (
+                <Box sx={{ p: 4, textAlign: 'center' }}>
+                  <Typography variant="body2" color="text.secondary">
+                    No notes found. Create your first note!
+                  </Typography>
+                </Box>
+              ) : (
+                notes.map((note) => (
+                  <Fade in key={note.id}>
+                    <StyledNoteCard
+                      selected={currentNote?.id === note.id}
+                      onClick={() => selectNote(note)}
+                    >
+                      <CardContent sx={{ p: 2, '&:last-child': { pb: 2 } }}>
+                        <Stack direction="row" justifyContent="space-between" alignItems="flex-start">
+                          <Box sx={{ flex: 1, minWidth: 0 }}>
+                            <Typography variant="h6" noWrap gutterBottom>
+                              {note.title}
+                            </Typography>
+                            <Typography variant="body2" color="text.secondary" sx={{ 
+                              display: '-webkit-box',
+                              WebkitLineClamp: 2,
+                              WebkitBoxOrient: 'vertical',
+                              overflow: 'hidden',
+                              mb: 1
+                            }}>
+                              {note.content.replace(/[#*`]/g, '').substring(0, 80)}...
+                            </Typography>
+                            <Chip 
+                              label={new Date(note.updated_at).toLocaleDateString('ja-JP')}
+                              size="small"
+                              variant="outlined"
+                              sx={{ fontSize: '0.75rem' }}
+                            />
+                          </Box>
+                          <IconButton
+                            size="small"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              deleteNote(note.id);
+                            }}
+                            sx={{ ml: 1, opacity: 0.7, '&:hover': { opacity: 1, color: 'error.main' } }}
+                          >
+                            <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
+                              <path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"/>
+                            </svg>
+                          </IconButton>
+                        </Stack>
+                      </CardContent>
+                    </StyledNoteCard>
+                  </Fade>
+                ))
+              )}
+            </Box>
+          </StyledSidebar>
+        </Grid>
+        <Grid size={8}>
+          <StyledMainContent>
+            {currentNote ? (
+              <>
+                <Paper elevation={0} sx={{ p: 3, borderBottom: 1, borderColor: 'divider' }}>
+                  <Stack direction="row" justifyContent="space-between" alignItems="center">
+                    <CustomTextField
+                      value={title}
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => setTitle(e.target.value)}
+                      placeholder="Note title..."
+                      variant="standard"
+                      sx={{ 
+                        flex: 1, 
+                        mr: 3,
+                        '& .MuiInput-input': { 
+                          fontSize: '1.5rem', 
+                          fontWeight: 'bold',
+                          color: 'text.primary'
+                        }
+                      }}
+                    />
+                    <Stack direction="row" spacing={2} alignItems="center">
+                      {saveStatus && (
+                        <Chip 
+                          label={saveStatus}
+                          color="success"
+                          size="small"
+                          sx={{ fontWeight: 'medium' }}
+                        />
+                      )}
+                      <Button
+                        variant="contained"
+                        color="success"
+                        onClick={saveNote}
+                        sx={{ px: 3, py: 1, borderRadius: 2 }}
+                      >
+                        Save
+                      </Button>
+                    </Stack>
+                  </Stack>
+                </Paper>
+                
+                <StyledEditorContainer>
+                  <Box className="editor-pane">
+                    <Paper elevation={0} sx={{ p: 2, borderBottom: 1, borderColor: 'divider', backgroundColor: 'grey.50' }}>
+                      <Stack direction="row" alignItems="center" spacing={1}>
+                        <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: 'success.main' }} />
+                        <Typography variant="subtitle2" fontWeight="medium" color="text.secondary">
+                          Editor
+                        </Typography>
+                      </Stack>
+                    </Paper>
+                    <Box
+                      component="textarea"
+                      value={content}
+                      onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setContent(e.target.value)}
+                      placeholder="Start writing your markdown here..."
+                      sx={{
+                        flex: 1,
+                        p: 3,
+                        border: 'none',
+                        outline: 'none',
+                        resize: 'none',
+                        fontFamily: 'Monaco, Consolas, monospace',
+                        fontSize: '0.875rem',
+                        lineHeight: 1.6,
+                        backgroundColor: 'background.paper',
+                        color: 'text.primary',
+                        '&::placeholder': {
+                          color: 'text.secondary',
+                          opacity: 0.7
+                        }
+                      }}
+                    />
+                  </Box>
+                  
+                  <Box className="preview-pane">
+                    <Paper elevation={0} sx={{ p: 2, borderBottom: 1, borderColor: 'divider', backgroundColor: 'grey.50' }}>
+                      <Stack direction="row" alignItems="center" spacing={1}>
+                        <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: 'primary.main' }} />
+                        <Typography variant="subtitle2" fontWeight="medium" color="text.secondary">
+                          Preview
+                        </Typography>
+                      </Stack>
+                    </Paper>
+                    <Box sx={{ 
+                      flex: 1, 
+                      overflow: 'auto', 
+                      p: 3, 
+                      backgroundColor: 'background.paper',
+                      '& .markdown-preview': {
+                        fontFamily: 'inherit'
+                      }
+                    }}>
+                      <div className="markdown-preview">
+                        <ReactMarkdown
+                          remarkPlugins={[remarkGfm]}
+                          rehypePlugins={[rehypeHighlight, rehypeRaw]}
+                        >
+                          {processMarkdownLinks(content)}
+                        </ReactMarkdown>
+                      </div>
+                    </Box>
+                  </Box>
+                </StyledEditorContainer>
+              </>
+            ) : (
+              <Box sx={{ 
+                flex: 1, 
+                display: 'flex', 
+                alignItems: 'center', 
+                justifyContent: 'center',
+                textAlign: 'center'
+              }}>
+                <Stack spacing={3} alignItems="center">
+                  <Box sx={{ 
+                    width: 80, 
+                    height: 80, 
+                    borderRadius: '50%', 
+                    bgcolor: 'primary.light',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                  }}>
+                    <svg width="40" height="40" fill="currentColor" viewBox="0 0 24 24" color="primary.main">
+                      <path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                  </Box>
+                  <Stack spacing={1}>
+                    <Typography variant="h5" color="text.primary">
+                      Select a note to start editing
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      Or create a new note to get started
+                    </Typography>
+                  </Stack>
+                </Stack>
+              </Box>
+            )}
+          </StyledMainContent>
+        </Grid>
+      </Grid>
+    </Box>
   );
 }

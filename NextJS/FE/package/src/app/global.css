@@ -30,83 +30,156 @@
     line-height: 1.5;
   }
 
-/* Enhanced Markdown Preview Styles */
+/* Enhanced Markdown Preview Styles with Material-UI Integration */
 .markdown-preview {
   @apply prose prose-gray max-w-none;
+  font-family: 'DM Sans', sans-serif;
 }
 
 .markdown-preview h1 {
-  @apply text-3xl font-bold text-gray-900 mb-6 mt-8 pb-2 border-b border-gray-200;
+  color: #11142d;
+  font-weight: 500;
+  font-size: 1.875rem;
+  line-height: 1.5;
+  margin-bottom: 1.5rem;
+  margin-top: 2rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid #e9e9e9;
 }
 
 .markdown-preview h2 {
-  @apply text-2xl font-semibold text-gray-800 mb-4 mt-6 pb-1 border-b border-gray-100;
+  color: #11142d;
+  font-weight: 500;
+  font-size: 1.5rem;
+  line-height: 1.5;
+  margin-bottom: 1rem;
+  margin-top: 1.5rem;
+  padding-bottom: 0.25rem;
+  border-bottom: 1px solid #ecf0f2;
 }
 
 .markdown-preview h3 {
-  @apply text-xl font-semibold text-gray-800 mb-3 mt-5;
+  color: #11142d;
+  font-weight: 500;
+  font-size: 1.3125rem;
+  line-height: 1.5;
+  margin-bottom: 0.75rem;
+  margin-top: 1.25rem;
 }
 
 .markdown-preview h4 {
-  @apply text-lg font-medium text-gray-700 mb-2 mt-4;
+  color: #11142d;
+  font-weight: 500;
+  font-size: 1.125rem;
+  line-height: 1.5;
+  margin-bottom: 0.5rem;
+  margin-top: 1rem;
 }
 
 .markdown-preview h5 {
-  @apply text-base font-medium text-gray-700 mb-2 mt-3;
+  color: #11142d;
+  font-weight: 500;
+  font-size: 1rem;
+  line-height: 1.5;
+  margin-bottom: 0.5rem;
+  margin-top: 0.75rem;
 }
 
 .markdown-preview h6 {
-  @apply text-sm font-medium text-gray-600 mb-2 mt-3;
+  color: #11142d;
+  font-weight: 500;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  margin-bottom: 0.5rem;
+  margin-top: 0.75rem;
 }
 
 .markdown-preview p {
-  @apply text-gray-700 leading-relaxed mb-4;
+  color: #777e89;
+  line-height: 1.6;
+  margin-bottom: 1rem;
 }
 
-.markdown-preview ul {
-  @apply list-disc list-inside mb-4 space-y-1;
-}
-
-.markdown-preview ol {
-  @apply list-decimal list-inside mb-4 space-y-1;
+.markdown-preview ul, .markdown-preview ol {
+  margin-bottom: 1rem;
+  padding-left: 1.5rem;
 }
 
 .markdown-preview li {
-  @apply text-gray-700 leading-relaxed;
+  color: #777e89;
+  line-height: 1.6;
+  margin-bottom: 0.25rem;
 }
 
 .markdown-preview blockquote {
-  @apply border-l-4 border-blue-500 pl-4 py-2 mb-4 bg-blue-50 text-gray-700 italic;
+  border-left: 4px solid #1e4db7;
+  padding-left: 1rem;
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+  margin-bottom: 1rem;
+  background-color: #e7ecf7;
+  color: #777e89;
+  font-style: italic;
 }
 
 .markdown-preview code {
-  @apply bg-gray-100 text-gray-800 px-1 py-0.5 rounded text-sm font-mono;
+  background-color: #ecf0f2;
+  color: #11142d;
+  padding: 0.125rem 0.25rem;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  font-family: Monaco, Consolas, monospace;
 }
 
 .markdown-preview pre {
-  @apply bg-gray-900 text-gray-100 p-4 rounded-lg mb-4 overflow-x-auto;
+  background-color: #2A3547;
+  color: #ffffff;
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  overflow-x: auto;
 }
 
 .markdown-preview pre code {
-  @apply bg-transparent text-inherit p-0;
+  background-color: transparent;
+  color: inherit;
+  padding: 0;
 }
 
 .markdown-preview a {
-  @apply text-blue-600 hover:text-blue-800 underline;
+  color: #1e4db7;
+  text-decoration: none;
+}
+
+.markdown-preview a:hover {
+  color: #173f98;
+  text-decoration: underline;
 }
 
 .markdown-preview table {
-  @apply w-full border-collapse border border-gray-300 mb-4;
+  width: 100%;
+  border-collapse: collapse;
+  border: 1px solid #e9e9e9;
+  margin-bottom: 1rem;
 }
 
 .markdown-preview th {
-  @apply bg-gray-100 border border-gray-300 px-4 py-2 text-left font-semibold;
+  background-color: #ecf0f2;
+  border: 1px solid #e9e9e9;
+  padding: 0.75rem;
+  text-align: left;
+  font-weight: 500;
+  color: #11142d;
 }
 
 .markdown-preview td {
-  @apply border border-gray-300 px-4 py-2;
+  border: 1px solid #e9e9e9;
+  padding: 0.75rem;
+  color: #777e89;
 }
 
 .markdown-preview hr {
-  @apply border-0 border-t border-gray-300 my-6;
+  border: 0;
+  border-top: 1px solid #e9e9e9;
+  margin: 1.5rem 0;
 }
