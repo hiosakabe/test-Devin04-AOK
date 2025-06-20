@@ -346,7 +346,7 @@ export default function MarkdownEditorPage() {
                 <div className="p-2 bg-gray-100 border-b border-gray-200">
                   <span className="text-sm font-medium text-gray-600">Preview</span>
                 </div>
-                <div className="h-full overflow-y-auto p-4 prose prose-sm max-w-none">
+                <div className="h-full overflow-y-auto p-4 markdown-preview">
                   <ReactMarkdown
                     remarkPlugins={[remarkGfm]}
                     rehypePlugins={[rehypeHighlight, rehypeRaw]}

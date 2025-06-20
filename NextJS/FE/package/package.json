@@ -22,6 +22,7 @@
     "@mui/material": "^6.4.7",
     "@tabler/icons-react": "^3.30.0",
     "@tailwindcss/postcss": "^4.0.14",
+    "@tailwindcss/typography": "^0.5.16",
     "@types/node": "22.7.4",
     "@types/react": "18.3.10",
     "@types/react-dom": "18.3.0",

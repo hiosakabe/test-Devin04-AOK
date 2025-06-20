@@ -5,7 +5,7 @@ from sqlalchemy import pool
 
 from alembic import context
 
-from app.db.models import Base 
+from db.models import Base 
 import os 
 from dotenv import load_dotenv
 
@@ -32,11 +32,7 @@ target_metadata = Base.metadata
 
 load_dotenv()
 
-username = os.getenv('SQL_USERNAME')
-password = os.getenv('SQL_PASSWORD')
-db_name = os.getenv('DB_NAME')
-
-DATABASE_URL = f'postgresql://{username}:{password}@localhost:5432/{db_name}'
+DATABASE_URL = 'sqlite:///./markdown_notes.db'
 
 
 def run_migrations_offline() -> None:

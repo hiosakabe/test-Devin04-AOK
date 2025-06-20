@@ -12,11 +12,7 @@ import psycopg2
 load_dotenv()
 
 def connect_local():
-    dbhost = os.getenv('DBHOST')
-    username = urllib.parse.unquote(os.getenv('SQL_USERNAME'))
-    password = os.getenv('SQL_PASSWORD')
-    db_name = os.getenv('DB_NAME')
-    database_url = f'postgresql://{username}:{password}@{dbhost}:5432/{db_name}'
+    database_url = 'sqlite:///./markdown_notes.db'
     return database_url
 
 if os.getenv('AzureConnectionFlag') == "True":

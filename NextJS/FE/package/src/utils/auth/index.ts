@@ -11,10 +11,10 @@ export async function getAuthToken(
   password?: string
 ): Promise<{ access_token: string }> {
   try {
-    // Use provided credentials or fall back to dummy values
+    // Use provided credentials or fall back to test user credentials
     const credentials = {
-      username: username || "XXXX", // Replaced with dummy value
-      password: password || "XXXX", // Replaced with dummy value
+      username: username || "postgres", // Test user created by initial_data.py
+      password: password || "password", // Test user password
     };
 
     const response = await fetch(apiUrl, {
