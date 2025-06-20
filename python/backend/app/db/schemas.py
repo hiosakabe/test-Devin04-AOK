@@ -78,3 +78,37 @@ class TextboxCommit(TextboxCommitBase):
     
     class Config:
         orm_mode = True
+
+class MarkdownNoteBase(BaseModel):
+    title: str
+    content: str
+
+class MarkdownNoteCreate(MarkdownNoteBase):
+    pass
+
+class MarkdownNoteUpdate(BaseModel):
+    title: t.Optional[str] = None
+    content: t.Optional[str] = None
+
+class MarkdownNote(MarkdownNoteBase):
+    id: int
+    user_id: int
+    created_at: datetime.datetime
+    updated_at: datetime.datetime
+    
+    class Config:
+        orm_mode = True
+
+class NoteLinkBase(BaseModel):
+    source_note_id: int
+    target_note_id: int
+
+class NoteLinkCreate(NoteLinkBase):
+    pass
+
+class NoteLink(NoteLinkBase):
+    id: int
+    created_at: datetime.datetime
+    
+    class Config:
+        orm_mode = True

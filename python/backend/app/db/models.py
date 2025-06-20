@@ -1,4 +1,5 @@
-from sqlalchemy import Boolean, Column, Integer, String, DateTime
+from sqlalchemy import Boolean, Column, Integer, String, DateTime, Text, ForeignKey
+from sqlalchemy.orm import relationship
 import datetime
 
 from .db import Base
@@ -17,6 +18,8 @@ class User(Base):
     hashed_password = Column(String, nullable=False)
     is_active = Column(Boolean, default=True)
     is_superuser = Column(Boolean, default=False)
+    
+    notes = relationship("MarkdownNote", back_populates="user")
 
 class TextboxDraft(Base):
     __tablename__ = "textbox_draft"
@@ -33,3 +36,26 @@ class TextboxCommit(Base):
     content = Column(String, nullable=False)
     created_at = Column(DateTime, default=datetime.datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow)
+
+class MarkdownNote(Base):
+    __tablename__ = "markdown_notes"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    title = Column(String, nullable=False, index=True)
+    content = Column(Text, nullable=False)
+    user_id = Column(Integer, ForeignKey("user.id"), nullable=False)
+    created_at = Column(DateTime, default=datetime.datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow)
+    
+    user = relationship("User", back_populates="notes")
+
+class NoteLink(Base):
+    __tablename__ = "note_links"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    source_note_id = Column(Integer, ForeignKey("markdown_notes.id"), nullable=False)
+    target_note_id = Column(Integer, ForeignKey("markdown_notes.id"), nullable=False)
+    created_at = Column(DateTime, default=datetime.datetime.utcnow)
+    
+    source_note = relationship("MarkdownNote", foreign_keys=[source_note_id])
+    target_note = relationship("MarkdownNote", foreign_keys=[target_note_id])

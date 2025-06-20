@@ -29,7 +29,7 @@ export default function TextEditPage() {
       const tokenData = await getAuthToken();
 
       // Send text to backend with token
-      const response = await fetch("http://localhost:8000/api/v1/textbox_commit", {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/api/v1/textbox_commit`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -60,7 +60,7 @@ export default function TextEditPage() {
       const tokenData = await getAuthToken();
 
       // Send text to backend with token
-      const res2 = await fetch("http://localhost:8000/api/v1/textbox_draft", {
+      const res2 = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/api/v1/textbox_draft`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -93,7 +93,7 @@ export default function TextEditPage() {
         const tokenData = await getAuthToken();
         
         // Fetch latest draft
-        const response = await fetch("http://localhost:8000/api/v1/textbox_draft", {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/api/v1/textbox_draft`, {
           method: "GET",
           headers: {
             Authorization: `Bearer ${tokenData.access_token}`,
